@@ -18,3 +18,5 @@ build/
 front/parser.h
 front/parser.c
 front/parser.output
+parser.output
+parser.txt
