@@ -22,8 +22,25 @@
 #include "ffi.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include <dlfcn.h>
+
+int test_print_str(const char * str)
+{
+    char c = 0;
+
+    while ((c = *str++) != 0)
+    {
+        if (c != '\n')
+        {
+            printf("-%c-", c);
+        }
+    }
+    printf("\n");
+    
+    return 0;
+}
 
 ffi_decl * ffi_decl_new(unsigned int count)
 {
@@ -93,6 +110,12 @@ int ffi_decl_call(ffi_decl * decl, char * fname, char * libname)
 {
     void (* func)(void) = NULL;
     void * handle = NULL;
+
+    /* open for main program */    
+    if (strcmp(libname, "main") == 0)
+    {
+        libname = NULL;
+    }
     
     handle = dlopen(libname, RTLD_LAZY);
     if (handle == NULL)
