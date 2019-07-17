@@ -48,20 +48,6 @@ void run(int param1, int param2, program * prog)
     }
 }
 
-char * readall(const char * file)
-{
-    FILE * f = fopen(file, "r");
-    fseek(f, 0L, SEEK_END);
-    long fsize = ftell(f);
-    fseek(f, 0L, SEEK_SET);
-
-    char * src = (char *)calloc(fsize + 1, sizeof(char));
-    fread(src, sizeof(char), fsize, f);
-    fclose(f);
-
-    return src;
-}
-
 void test_one()
 {
     int ret = 0;
@@ -85,28 +71,48 @@ void test_one()
     program_delete(prog);
 }
 
+char * readall(const char * file)
+{
+    FILE * f = fopen(file, "r");
+    fseek(f, 0L, SEEK_END);
+    long fsize = ftell(f);
+    fseek(f, 0L, SEEK_SET);
+
+    char * src = (char *)calloc(fsize + 1, sizeof(char));
+    fread(src, sizeof(char), fsize, f);
+    fclose(f);
+
+    return src;
+}
+
 void test_sample(const char * samplepath)
 {
-    int ret = 0;
-    object result = { 0 };
-    program * prog = program_new();
     char * prog_str = readall(samplepath);
-    if (NULL != prog_str)
+    if (prog_str != NULL)
     {
-        ret = nev_compile_str(prog_str, prog);
-        if (ret != 0) {
-            printf("path: %s\nprog_str: %s\n", samplepath, prog_str);
+        program * prog = program_new();
+        if (prog != NULL)
+        {
+            int ret = 0;
+            object result = { 0 };
+
+            ret = nev_compile_str(prog_str, prog);
+            if (ret != 0)
+            {
+                printf("path: %s\nprog_str: %s\n", samplepath, prog_str);
+            }
+            assert(ret == 0);
+
+            ret = nev_execute(prog, &result, DEFAULT_VM_MEM_SIZE,
+                              DEFAULT_VM_STACK_SIZE);
+            if (ret != 0)
+            {
+                printf("path: %s\nprog_str: %s\n", samplepath, prog_str);
+            }
+            assert(ret == 0);
+
+            program_delete(prog);
         }
-        assert(ret == 0);
-
-        ret = nev_execute(prog, &result, DEFAULT_VM_MEM_SIZE,
-                          DEFAULT_VM_STACK_SIZE);
-        if (ret != 0) {
-            printf("path: %s\nprog_str: %s\n", samplepath, prog_str);
-        }
-
-        assert(ret == 0);
-
         free(prog_str);
     }
 }

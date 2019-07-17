@@ -19,88 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include "nev.h"
 #include <stdio.h>
+#include <assert.h>
 
-int print_zero()
-{
-    printf("0");
-    
-    return 0;
-}
+int print_zero()    { printf("zero ");      return 0; }
+int print_one()     { printf("I ");         return 0; }
+int print_two()     { printf("owt ");       return 0; }
+int print_three()   { printf("threee ");    return 0; }
+int print_four()    { printf("IV ");        return 0; }
+int print_five()    { printf("vife ");      return 0; }
+int print_six()     { printf("ssiixx ");    return 0; }
+int print_seven()   { printf("zodd ");      return 0; }
+int print_eight()   { printf("e-i-g-h-t "); return 0; }
+int print_nine()    { printf("9ine ");      return 0; }
+int print_newline() { printf("\n");         return 0; }
 
-int print_one()
+int print_digit(char d)
 {
-    printf("1");
-    
-    return 0;
-}
-
-int print_two()
-{
-    printf("2");
-    
-    return 0;
-}
-
-int print_three()
-{
-    printf("3");
-    
-    return 0;
-}
-
-int print_four()
-{
-    printf("4");
-    
-    return 0;
-}
-
-int print_five()
-{
-    printf("5");
-    
-    return 0;
-}
-
-int print_six()
-{
-    printf("6");
-    
-    return 0;
-}
-
-int print_seven()
-{
-    printf("7");
-    
-    return 0;
-}
-
-int print_eight()
-{
-    printf("8");
-    
-    return 0;
-}
-
-int print_nine()
-{
-    printf("9");
-    
-    return 0;
-}
-
-int print_newline()
-{
-    printf("\n");
-    
-    return 0;
-}
-
-int print_char(char c)
-{
-    switch (c)
+    switch (d)
     {
         case '0': print_zero(); break;
         case '1': print_one(); break;
@@ -118,21 +55,55 @@ int print_char(char c)
     return 0;
 }
 
-int print_str(const char * str)
+int print_digits(const char * digits)
 {
-    char c = 0;
+    char d = 0;
 
-    while ((c = *str++) != 0)
+    while ((d = *digits++) != 0)
     {
-        print_char(c);
+        print_digit(d);
     }
+    printf("\n");
     
     return 0;
 }
 
 void test_one()
 {
-    print_str("1234567890\n");
+    const char * prog_str =
+        "extern \"main\" func print_digits(digits : string) -> int"
+        "                                     "
+        "func main() -> int                   "
+        "{                                    "
+        "    var d = 0;                       "
+        "    var dig = \"\";                  "
+        "                                     "
+        "    for (d = 0; d < 10; d = d + 1)   "
+        "        dig = dig + d;               "
+        "                                     "
+        "    print_digits(dig);               "
+        "                                     "
+        "    0                                "
+        "}                                    "
+        "                                     ";
+    int ret = 0;
+    program * prog = program_new();
+
+    ret = nev_compile_str(prog_str, prog);
+    if (ret == 0)
+    {
+        object result = { 0 };
+
+        ret =
+            nev_execute(prog, &result, DEFAULT_VM_MEM_SIZE, DEFAULT_VM_STACK_SIZE);
+        if (ret == 0)
+        {
+            assert(result.type == OBJECT_INT &&
+                   result.int_value == 0);
+        }
+    }
+
+    program_delete(prog);
 }
 
 int main(int argc, char * argv[])
